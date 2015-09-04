@@ -1,0 +1,23 @@
+2015-07-26 22:35:44,167 manager INFO 1.1.0
+2015-07-26 22:35:44,168 manager INFO Copyright (C) 2003-2010
+2015-07-26 22:35:44,168 manager INFO   Noriaki Ando
+2015-07-26 22:35:44,168 manager INFO   Intelligent Systems Research Institute, AIST
+2015-07-26 22:35:44,168 manager INFO Manager starting.
+2015-07-26 22:35:44,168 manager INFO Starting local logging.
+2015-07-26 22:35:44,176 manager.namingmanager INFO NameServer connection succeeded: corba/localhost
+2015-07-26 22:35:44,187 ManagerServant INFO Master manager not found
+2015-07-26 22:35:44,188 manager WARNING Traceback (most recent call last):
+  File "C:\Python27\lib\site-packages\OpenRTM_aist\Manager.py", line 1900, in initManagerServant
+    reffile = file(self._config.getProperty("manager.refstring_path"),'w')
+IOError: [Errno 2] No such file or directory: '/var/log/rtcmanager.ref'
+
+2015-07-26 22:35:44,190 LocalServiceAdmin INFO All the local services are enabled.
+2015-07-26 22:35:44,196 manager INFO Component type conf file: Gamepad.conf loaded.
+2015-07-26 22:35:44,198 ec_base INFO setRate(1000000.000000) done
+2015-07-26 22:35:44,198 ec_base INFO setRate(1000.000000) done
+2015-07-26 22:35:44,200 rtobject INFO 1 execution context was created.
+2015-07-26 22:35:44,572 rtobject INFO Initial active configuration set is default.
+2015-07-26 22:35:47,493 SdoServiceAdmin WARNING No available SDO service in the factory: 
+2015-07-26 22:35:47,493 SdoServiceAdmin ERROR type  already exists.
+2015-07-26 22:35:47,496 SdoServiceAdmin WARNING No available SDO service in the factory: IDL:OpenRTM/ComponentObserver:1.0
+2015-07-26 22:35:47,496 SdoServiceAdmin ERROR type b16dd49d-6828-442a-8b8c-d93c53ce73ea already exists.

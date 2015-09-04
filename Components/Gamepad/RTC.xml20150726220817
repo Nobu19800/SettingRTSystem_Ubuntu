@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<rtc:RtcProfile rtc:version="0.2" rtc:id="RTC:Miyamoto Nobuhiko:Game:Gamepad:1.0.0" xmlns:rtcExt="http://www.openrtp.org/namespaces/rtc_ext" xmlns:rtcDoc="http://www.openrtp.org/namespaces/rtc_doc" xmlns:rtc="http://www.openrtp.org/namespaces/rtc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <rtc:BasicInfo xsi:type="rtcExt:basic_info_ext" rtcExt:saveProject="Gamepad" rtc:updateDate="2015-07-26T22:06:58.372+09:00" rtc:creationDate="2015-07-26T21:15:49+09:00" rtc:abstract="ゲームのコントローラーへの入力をDataOutPortから出力するRTCです。
+※あらかじめpygameをインストールしておかないと動作できません。" rtc:version="1.0.0" rtc:vendor="Miyamoto Nobuhiko" rtc:maxInstances="1" rtc:executionType="PeriodicExecutionContext" rtc:executionRate="1000.0" rtc:description="Gamepad" rtc:category="Game" rtc:componentKind="DataFlowComponent" rtc:activityType="PERIODIC" rtc:componentType="STATIC" rtc:name="Gamepad">
+        <rtcDoc:Doc rtcDoc:reference="" rtcDoc:license="LGPL" rtcDoc:creator="" rtcDoc:algorithm="" rtcDoc:inout="" rtcDoc:description="ゲームのコントローラーへの入力をDataOutPortから出力するRTCです。"/>
+        <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
+    </rtc:BasicInfo>
+    <rtc:Actions>
+        <rtc:OnInitialize xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnFinalize xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnStartup xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnShutdown xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnActivated xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnDeactivated xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnAborting xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnError xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnReset xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnExecute xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnStateUpdate xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnRateChanged xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnAction xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+        <rtc:OnModeChanged xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
+    </rtc:Actions>
+    <rtc:ConfigurationSet>
+        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="" rtc:unit="" rtc:defaultValue="0" rtc:type="int" rtc:name="id">
+            <rtc:Constraint>
+                <rtc:ConstraintUnitType>
+                    <rtc:propertyIsBetween>
+                        <rtc:LowerBoundary>0</rtc:LowerBoundary>
+                        <rtc:UpperBoundary>100</rtc:UpperBoundary>
+                    </rtc:propertyIsBetween>
+                </rtc:ConstraintUnitType>
+            </rtc:Constraint>
+            <rtcDoc:Doc rtcDoc:constraint="0&lt;=x&lt;=100" rtcDoc:range="" rtcDoc:unit="" rtcDoc:description="ゲームパッドのID" rtcDoc:defaultValue="0" rtcDoc:dataname="id"/>
+            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
+        </rtc:Configuration>
+    </rtc:ConfigurationSet>
+    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedFloat" rtc:name="ball" rtc:portType="DataOutPort">
+        <rtcDoc:Doc rtcDoc:operation="" rtcDoc:occerrence="" rtcDoc:unit="" rtcDoc:semantics="" rtcDoc:number="" rtcDoc:type="RTC::TimedFloat" rtcDoc:description="トラックボールの相対位置"/>
+    </rtc:DataPorts>
+    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedBooleanSeq" rtc:name="button" rtc:portType="DataOutPort">
+        <rtcDoc:Doc rtcDoc:operation="" rtcDoc:occerrence="" rtcDoc:unit="" rtcDoc:semantics="" rtcDoc:number="" rtcDoc:type="RTC::TimedBooleanSeq" rtcDoc:description="ボタンの入力&lt;br/&gt;左、上、下、右、L1、R1、L2、R2、？、？、セレクト、スタートの順"/>
+    </rtc:DataPorts>
+    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedBooleanSeq" rtc:name="hat" rtc:portType="DataOutPort">
+        <rtcDoc:Doc rtcDoc:operation="" rtcDoc:occerrence="" rtcDoc:unit="" rtcDoc:semantics="" rtcDoc:number="" rtcDoc:type="RTC::TimedBooleanSeq" rtcDoc:description="十字キーの押している方向&lt;br/&gt;右、左、下、上の順序"/>
+    </rtc:DataPorts>
+    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedFloatSeq" rtc:name="axis0" rtc:portType="DataOutPort">
+        <rtcDoc:Doc rtcDoc:operation="" rtcDoc:occerrence="" rtcDoc:unit="" rtcDoc:semantics="" rtcDoc:number="" rtcDoc:type="RTC::TimedFloatSeq" rtcDoc:description="アナログスティックの方向&lt;br/&gt;アナログスティックが2つの場合は、右側のアナログスティックの入力値を取得"/>
+    </rtc:DataPorts>
+    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedFloatSeq" rtc:name="axis1" rtc:portType="DataOutPort">
+        <rtcDoc:Doc rtcDoc:operation="" rtcDoc:occerrence="" rtcDoc:unit="" rtcDoc:semantics="" rtcDoc:number="" rtcDoc:type="RTC::TimedFloatSeq" rtcDoc:description="アナログスティックの方向&lt;br/&gt;アナログスティックが2つの場合は、左側のアナログスティックの入力値を取得"/>
+    </rtc:DataPorts>
+    <rtc:Language xsi:type="rtcExt:language_ext" rtc:kind="Python">
+        <rtcExt:targets rtcExt:os="Windows" rtcExt:langVersion="New Version">
+            <rtcExt:osVersions>Vista</rtcExt:osVersions>
+            <rtcExt:osVersions>8.1</rtcExt:osVersions>
+            <rtcExt:libraries rtcExt:other="http://www.pygame.org/" rtcExt:version="1.9.1" rtcExt:name="pygame"/>
+        </rtcExt:targets>
+    </rtc:Language>
+</rtc:RtcProfile>

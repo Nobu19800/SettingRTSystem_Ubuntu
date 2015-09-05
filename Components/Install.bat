@@ -39,3 +39,4 @@ cmd /c UnaryMinus\Install.bat
 cmd /c UniformRandomNumber\Install.bat
 cmd /c WrapToZero\Install.bat
 cmd /c MyFirstComponent\Install.bat
+cmd /c testEC\Install.bat

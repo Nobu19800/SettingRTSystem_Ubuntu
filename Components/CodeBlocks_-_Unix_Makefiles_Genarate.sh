@@ -40,3 +40,4 @@ sh UnaryMinus/CodeBlocks_-_Unix_Makefiles_Genarate.sh
 sh UniformRandomNumber/CodeBlocks_-_Unix_Makefiles_Genarate.sh
 sh WrapToZero/CodeBlocks_-_Unix_Makefiles_Genarate.sh
 sh MyFirstComponent/CodeBlocks_-_Unix_Makefiles_Genarate.sh
+sh testEC/CodeBlocks_-_Unix_Makefiles_Genarate.sh

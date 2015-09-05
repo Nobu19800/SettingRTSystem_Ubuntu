@@ -39,3 +39,4 @@ cmd /c UnaryMinus\unInstall.bat
 cmd /c UniformRandomNumber\unInstall.bat
 cmd /c WrapToZero\unInstall.bat
 cmd /c MyFirstComponent\unInstall.bat
+cmd /c testEC\unInstall.bat

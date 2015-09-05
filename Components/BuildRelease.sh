@@ -40,3 +40,4 @@ sh UnaryMinus/BuildRelease.sh
 sh UniformRandomNumber/BuildRelease.sh
 sh WrapToZero/BuildRelease.sh
 sh MyFirstComponent/BuildRelease.sh
+sh testEC/BuildRelease.sh

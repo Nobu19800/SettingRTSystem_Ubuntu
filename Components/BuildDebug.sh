@@ -40,3 +40,4 @@ sh UnaryMinus/BuildDebug.sh
 sh UniformRandomNumber/BuildDebug.sh
 sh WrapToZero/BuildDebug.sh
 sh MyFirstComponent/BuildDebug.sh
+sh testEC/BuildDebug.sh

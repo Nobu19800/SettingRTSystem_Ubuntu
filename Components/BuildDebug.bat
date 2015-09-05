@@ -39,3 +39,4 @@ cmd /c UnaryMinus\BuildDebug.bat
 cmd /c UniformRandomNumber\BuildDebug.bat
 cmd /c WrapToZero\BuildDebug.bat
 cmd /c MyFirstComponent\BuildDebug.bat
+cmd /c testEC\BuildDebug.bat

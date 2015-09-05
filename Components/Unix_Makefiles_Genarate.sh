@@ -40,3 +40,4 @@ sh UnaryMinus/Unix_Makefiles_Genarate.sh
 sh UniformRandomNumber/Unix_Makefiles_Genarate.sh
 sh WrapToZero/Unix_Makefiles_Genarate.sh
 sh MyFirstComponent/Unix_Makefiles_Genarate.sh
+sh testEC/Unix_Makefiles_Genarate.sh

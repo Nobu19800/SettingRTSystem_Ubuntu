@@ -39,3 +39,4 @@ cmd /c UnaryMinus\BuildRelease.bat
 cmd /c UniformRandomNumber\BuildRelease.bat
 cmd /c WrapToZero\BuildRelease.bat
 cmd /c MyFirstComponent\BuildRelease.bat
+cmd /c testEC\BuildRelease.bat

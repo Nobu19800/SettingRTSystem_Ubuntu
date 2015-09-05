@@ -40,3 +40,4 @@ sh UnaryMinus/unInstall.sh
 sh UniformRandomNumber/unInstall.sh
 sh WrapToZero/unInstall.sh
 sh MyFirstComponent/unInstall.sh
+sh testEC/unInstall.sh

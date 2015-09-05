@@ -40,3 +40,4 @@ sh UnaryMinus/Install.sh
 sh UniformRandomNumber/Install.sh
 sh WrapToZero/Install.sh
 sh MyFirstComponent/Install.sh
+sh testEC/Install.sh

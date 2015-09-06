@@ -1,3 +1,10 @@
+/*!
+* @file  RobotArm.cpp
+* @brief サインスマート製4自由度ロボットアーム制御クラス
+*
+*/
+
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <fstream>
@@ -27,15 +34,40 @@
 #define FingerHeight 0.005
 #define HandRadius 0.016
 
+#define MOTOR_UPPER__LIMIT_0 M_PI*90/180+0.001
+#define MOTOR_UPPER__LIMIT_1 M_PI*105/180+0.001
+#define MOTOR_UPPER__LIMIT_2 M_PI*90/180+0.001
+#define MOTOR_UPPER__LIMIT_3 M_PI/2+0.001
+
+#define MOTOR_LOWER__LIMIT_0 -M_PI*90/180-0.001
+#define MOTOR_LOWER__LIMIT_1 -0.001
+#define MOTOR_LOWER__LIMIT_2 -0.001
+#define MOTOR_LOWER__LIMIT_3 -M_PI/2-0.001
+
+
+#define MOTOR_OFFSET_0 M_PI*90/180
+#define MOTOR_OFFSET_1 M_PI*20/180
+#define MOTOR_OFFSET_2 M_PI*105/180
+#define MOTOR_OFFSET_3 M_PI/2
+
 
 //std::ofstream ofs( "test.txt" );
 
+/**
+*@brief 手先位置(もしくは関節角度)の目標位置、初期位置、到達時間等を格納するクラスのコンストラクタ
+*/
 TargetPos::TargetPos()
 {
 	time = 0;
 	
 }
 
+/**
+*@brief 目標手先位置を設定
+* @param t 到達時間(0以下に設定した場合は初期位置と目標位置との距離から自動的に計算)
+* @param t_p 手先位置
+* @param the 手先姿勢
+*/
 void TargetPos::setPoint(double t, Vector3d t_p,  double the)
 {
 
@@ -48,6 +80,14 @@ void TargetPos::setPoint(double t, Vector3d t_p,  double the)
 	end_time = t;
 }
 
+/**
+*@brief 初期手先位置を設定
+* @param s_p 初期手先位置
+* @param the 初期手先姿勢
+* @param maxSpeedCartesianTrans 手先の最大速度
+* @param maxSpeedCartesianRot 手先姿勢の最大速度
+* @param minTime 到達時間の最小値
+*/
 void TargetPos::setStartPoint(Vector3d s_p, double the, double maxSpeedCartesianTrans, double maxSpeedCartesianRot, double minTime)
 {
 	start_pos(0) = s_p(0);
@@ -82,7 +122,11 @@ void TargetPos::setStartPoint(Vector3d s_p, double the, double maxSpeedCartesian
 	}
 }
 
-
+/**
+*@brief 目標関節角度を設定
+* @param t 到達時間(0以下に設定した場合は初期関節角度と目標関節角度との距離から自動的に計算)
+* @param t_p 関節角度
+*/
 void TargetPos::setJointPos(double t, double *t_p)
 {
 	for(int i=0;i < 4;i++)
@@ -95,6 +139,11 @@ void TargetPos::setJointPos(double t, double *t_p)
 	end_time = t;
 }
 
+/**
+*@brief 目標関節角度を設定
+* @param t 到達時間
+* @param t_p 関節角度
+*/
 void TargetPos::setStartJointPos(double *s_p, double *maxSpeedJoint, double minTime)
 {
 	for(int i=0;i < 4;i++)
@@ -124,6 +173,9 @@ void TargetPos::setStartJointPos(double *s_p, double *maxSpeedJoint, double minT
 	}
 }
 
+/**
+*@brief サインスマート製4自由度ロボットアーム制御クラスのコンストラクタ
+*/
 RobotArm::RobotArm()
 {
 	jl = new Vector3d[4];
@@ -222,22 +274,22 @@ RobotArm::RobotArm()
 	
 
 
-	softUpperLimitJoint[0] = M_PI*90/180;
-	softUpperLimitJoint[1] = M_PI*105/180;
-	softUpperLimitJoint[2] = M_PI*90/180;
-	softUpperLimitJoint[3] = M_PI/2;
+	softUpperLimitJoint[0] = MOTOR_UPPER__LIMIT_0;
+	softUpperLimitJoint[1] = MOTOR_UPPER__LIMIT_1;
+	softUpperLimitJoint[2] = MOTOR_UPPER__LIMIT_2;
+	softUpperLimitJoint[3] = MOTOR_UPPER__LIMIT_3;
 
-	softLowerLimitJoint[0] = -M_PI*90/180;
-	softLowerLimitJoint[1] = -0.001;
-	softLowerLimitJoint[2] = -0.001;
-	softLowerLimitJoint[3] = -M_PI/2;
+	softLowerLimitJoint[0] = MOTOR_LOWER__LIMIT_0;
+	softLowerLimitJoint[1] = MOTOR_LOWER__LIMIT_1;
+	softLowerLimitJoint[2] = MOTOR_LOWER__LIMIT_2;
+	softLowerLimitJoint[3] = MOTOR_LOWER__LIMIT_3;
 
 	serbo = true;
 
-	manifactur = "";
-	type = "";
+	manifactur = "SainSmart";
+	type = "DIY 4-Axis Servos Control Palletizing Robot Arm";
 	axisNum = 4;
-	cmdCycle = 100;
+	cmdCycle = 50;
 	isGripper = false;
 
 	//speedPoint = 10;
@@ -252,28 +304,35 @@ RobotArm::RobotArm()
 
 	MinTime = dt;
 
-	jointOffset[0] = M_PI*90/180;
-	jointOffset[1] = M_PI*20/180;
-	jointOffset[2] = M_PI*105/180;
-	jointOffset[3] = M_PI/2;
+	jointOffset[0] = MOTOR_OFFSET_0;
+	jointOffset[1] = MOTOR_OFFSET_1;
+	jointOffset[2] = MOTOR_OFFSET_2;
+	jointOffset[3] = MOTOR_OFFSET_3;
 	
 
 }
 
+/**
+*@brief ホームポジションに移動
+*/
 void RobotArm::goHomePosition()
 {
 	//homePosition = calcKinematics();
 
 	//targetPoint = homePosition;
 
-	addTargetJointPos(homeTheta, -1);
+	//addTargetJointPos(homeTheta, -1);
+	setStartPos(homeTheta[0], homeTheta[1], homeTheta[2], homeTheta[3]);
 	
 
 	//startPoint = homePosition;
 	
 }
 
-
+/**
+*@brief ホームポジションの設定
+* @param jp ホームポジション
+*/
 void RobotArm::setHomePosition(double *jp)
 {
 	for(int i=0;i < 4;i++)
@@ -285,16 +344,27 @@ void RobotArm::setHomePosition(double *jp)
 	//homePosition = calcKinematics();
 }
 
+/**
+*@brief グリッパーを開く
+*/
 void RobotArm::openGripper()
 {
 	gripperPos = 0;
 }
 
+/**
+*@brief グリッパーを閉じる
+*/
 void RobotArm::closeGripper()
 {
 	gripperPos = hw - hf;
 }
 
+
+/**
+*@brief 更新
+* @param st 刻み幅
+*/
 void RobotArm::update(double st)
 {
 	
@@ -409,6 +479,13 @@ void RobotArm::update(double st)
 	
 }
 
+/**
+*@brief 関節角度のホームポジションを設定
+* @param o1 関節角速度(関節1)
+* @param o2 関節角速度(関節2)
+* @param o3 関節角速度(関節3)
+* @param o4 関節角速度(関節4)
+*/
 void RobotArm::setOffset(double o1, double o2, double o3, double o4)
 {
 	offset[0] = o1;
@@ -423,6 +500,12 @@ void RobotArm::setOffset(double o1, double o2, double o3, double o4)
 	//goHomePosition();
 }
 
+/**
+*@brief 目標位置追加
+* @param p 目標手先位置
+* @param the 目標手先姿勢
+* @param T 到達時間
+*/
 void RobotArm::addTargetPos(Vector3d p, double the, double T)
 {
 	TargetPos tp;
@@ -430,6 +513,11 @@ void RobotArm::addTargetPos(Vector3d p, double the, double T)
 	targetPoints.push_back(tp);
 }
 
+/**
+*@brief 目標関節角度追加
+* @param p 目標関節角度
+* @param T 到達時間
+*/
 void RobotArm::addTargetJointPos(double *p, double T)
 {
 	TargetPos tp;
@@ -437,6 +525,9 @@ void RobotArm::addTargetJointPos(double *p, double T)
 	targetPoints.push_back(tp);
 }
 
+/**
+*@brief 目標位置のリストの0番目に初期位置、到達時間を設定
+*/
 void RobotArm::setTargetPos()
 {
 	
@@ -481,6 +572,13 @@ void RobotArm::setTargetPos()
 	return;
 }
 
+/**
+*@brief 関節角度を入力
+* @param t1 関節角度(関節1)
+* @param t2 関節角度(関節2)
+* @param t3 関節角度(関節3)
+* @param t4 関節角度(関節4)
+*/
 void RobotArm::setAngle(double t1, double t2, double t3, double t4)
 {
 	theta[0] = t1;
@@ -491,6 +589,10 @@ void RobotArm::setAngle(double t1, double t2, double t3, double t4)
 	judgeSoftLimitJoint();
 }
 
+/**
+*@brief 手先位置取得
+* @return 手先位置
+*/
 Vector3d RobotArm::calcKinematics()
 {
 	Vector3d A;
@@ -509,6 +611,10 @@ Vector3d RobotArm::calcKinematics()
 	return A;
 }
 
+/**
+*@brief ヤコビ行列取得
+* @return ヤコビ行列
+*/
 Matrix3d RobotArm::calcJacobian()
 {
 
@@ -535,6 +641,11 @@ Matrix3d RobotArm::calcJacobian()
 
 }
 
+/**
+*@brief 手先速度から関節角速度を取得
+* @param v 手先速度
+* @return 関節角速度
+*/
 Vector3d RobotArm::calcJointVel(Vector3d v)
 {
 	Matrix3d J = calcJacobian();
@@ -551,6 +662,9 @@ Vector3d RobotArm::calcJointVel(Vector3d v)
 
 }
 
+/**
+*@brief 関節、手先位置がソフトリミット内かを判定し、ソフトリミット外の場合は停止する
+*/
 void RobotArm::judgeSoftLimitJoint()
 {
 	for(int i=0;i < 4;i++)
@@ -584,6 +698,13 @@ void RobotArm::judgeSoftLimitJoint()
 	}
 }
 
+/**
+*@brief 関節角速度の入力から関節角度を更新
+* @param v1 関節角速度(関節1)
+* @param v2 関節角速度(関節2)
+* @param v3 関節角速度(関節3)
+* @param v4 関節角速度(関節4)
+*/
 void RobotArm::updatePos(double v1, double v2, double v3, double v4)
 {
 
@@ -603,7 +724,10 @@ void RobotArm::updatePos(double v1, double v2, double v3, double v4)
 	
 }
 
-
+/**
+*@brief ベースオフセットの設定
+* @param bo ベースオフセット
+*/
 void RobotArm::setBaseOffset(double *bo)
 {
 	for(int i=0;i < 12;i++)
@@ -613,11 +737,19 @@ void RobotArm::setBaseOffset(double *bo)
 	
 }
 
+/**
+*@brief 手先最大速度の設定
+* @param msc 手先最大速度
+*/
 void RobotArm::setMaxSpeedCartesian(Vector3d msc)
 {
 	maxSpeedCartesian = msc;
 }
 
+/**
+*@brief 関節最大角速度の設定
+* @param msj 関節最大角速度
+*/
 void RobotArm::setMaxSpeedJoint(double *msj)
 {
 	maxSpeedJoint[0] = msj[0];
@@ -626,27 +758,46 @@ void RobotArm::setMaxSpeedJoint(double *msj)
 	maxSpeedJoint[3] = msj[3];
 }
 
+/**
+*@brief 手先のソフトリミット値の設定
+* @param usl ソフトリミットの最大値
+* @param lsl ソフトリミットの最小値
+*/
 void RobotArm::setSoftLimitCartesian(Vector3d usl, Vector3d lsl)
 {
 	softUpperLimitCartesian = usl;
 	softLowerLimitCartesian = lsl;
 }
 
+/**
+*@brief 一時停止
+*/
 void RobotArm::pause()
 {
 	pauseFalg = true;
 }
 
+/**
+*@brief 再開
+*/
 void RobotArm::resume()
 {
 	pauseFalg = false;
 }
 
+/**
+*@brief 停止
+*/
 void RobotArm::stop()
 {
 	stopFalg = true;
 }
 
+/**
+*@brief 関節のソフトリミット値の設定
+* @param usl ソフトリミットの最大値
+* @param lsl ソフトリミットの最小値
+*/
 void RobotArm::setSoftLimitJoint(double *usl, double *lsl)
 {
 	softUpperLimitJoint[0] = usl[0];
@@ -660,16 +811,31 @@ void RobotArm::setSoftLimitJoint(double *usl, double *lsl)
 	softLowerLimitJoint[3] = lsl[3];
 }
 
+/**
+*@brief サーボをオン、オフにする
+* @param state trueでオン、falseでオフ
+*/
 void RobotArm::setSerbo(bool state)
 {
 	serbo = state;
 }
 
+/**
+*@brief 手先の関節(関節4)の関節角度設定
+* @param hjp 関節角度
+*/
 void RobotArm::setHandJointPosition(double hjp)
 {
 	theta[3] = hjp;
 }
 
+/**
+*@brief 初期の手先位置設定
+* @param j1 関節角度(関節1)
+* @param j1 関節角度(関節2)
+* @param j1 関節角度(関節3)
+* @param j1 関節角度(関節4)
+*/
 void RobotArm::setStartPos(double j1, double j2, double j3, double j4)
 {
 	double hp[4] = {j1, j2,j3, j4};
@@ -682,18 +848,31 @@ void RobotArm::setStartPos(double j1, double j2, double j3, double j4)
 	//targetPoint = homePosition;
 	//startPoint = homePosition;
 
-	if(targetPoints.size() > 0)
-		targetPoints.erase(targetPoints.begin());
+	targetPoints.clear();
+	//if(targetPoints.size() > 0)
+	//	targetPoints.erase(targetPoints.begin());
 	//endTime = -1;
 
 	start();
 }
 
+/**
+*@brief 開始
+*/
 void RobotArm::start()
 {
 	stopFalg = false;
 }
 
+/**
+*@brief 目標関節角速度を計算
+* @param target_theta 目標関節角度
+* @param start_theta 初期関節角度
+* @param end_time 到達時間
+* @param time 現在の時間
+* @param angle 現在の関節角度
+* @return 目標関節角速度
+*/
 double RobotArm::calcVel(double target_theta, double start_theta, double end_time, double time, double angle)
 {
 	double d = target_theta - start_theta;
@@ -708,6 +887,10 @@ double RobotArm::calcVel(double target_theta, double start_theta, double end_tim
 	
 }
 
+/**
+*@brief モーターの角度を取得
+* @return モーターの角度
+*/
 double* RobotArm::getMotorPosition()
 {
 	

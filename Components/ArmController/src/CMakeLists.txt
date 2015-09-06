@@ -1,4 +1,11 @@
-set(comp_srcs ArmController.cpp ManipulatorCommonInterface_CommonSVC_impl.cpp ManipulatorCommonInterface_MiddleLevelSVC_impl.cpp RobotArm.cpp )
+set(arm_file_path ../RobotArm)
+set(defreturnid_file_path thirdparty/RTM_ORiN_Converter_CRD)
+
+#set(EigenDir C:/eigen-eigen-bdd17ee3b1b3)
+set(EigenDir ../../../eigen-eigen-10219c95fe65)
+
+
+set(comp_srcs ArmController.cpp ManipulatorCommonInterface_CommonSVC_impl.cpp ManipulatorCommonInterface_MiddleLevelSVC_impl.cpp ${arm_file_path}/RobotArm.cpp )
 set(standalone_srcs ArmControllerComp.cpp)
 
 if (DEFINED OPENRTM_INCLUDE_DIRS)
@@ -28,7 +35,9 @@ include_directories(${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_BINARY_DIR}/idl)
 include_directories(${OPENRTM_INCLUDE_DIRS})
 include_directories(${OMNIORB_INCLUDE_DIRS})
-include_directories(../../../eigen-eigen-10219c95fe65)
+include_directories(${EigenDir})
+include_directories(${arm_file_path})
+include_directories(${defreturnid_file_path})
 add_definitions(${OPENRTM_CFLAGS})
 add_definitions(${OMNIORB_CFLAGS})
 

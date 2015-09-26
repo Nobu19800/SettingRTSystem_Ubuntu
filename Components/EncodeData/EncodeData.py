@@ -89,14 +89,22 @@ class EncodeData(OpenRTM_aist.DataFlowComponentBase):
  
             
         return RTC.RTC_OK
- 
-def MyModuleInit(manager):
+
+def EncodeDataInit(manager):
     profile = OpenRTM_aist.Properties(defaults_str=encodedata_spec)
     manager.registerFactory(profile,
                             EncodeData,
                             OpenRTM_aist.Delete)
+
+
+
+def MyModuleInit(manager):
+    EncodeDataInit(manager)
+
+    # Create a component
     comp = manager.createComponent("EncodeData")
- 
+
+
 def main():
     mgr = OpenRTM_aist.Manager.init(sys.argv)
     mgr.setModuleInitProc(MyModuleInit)

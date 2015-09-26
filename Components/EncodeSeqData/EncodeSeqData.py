@@ -104,13 +104,25 @@ class EncodeSeqData(OpenRTM_aist.DataFlowComponentBase):
  
             
         return RTC.RTC_OK
- 
-def MyModuleInit(manager):
+
+
+def EncodeSeqDataInit(manager):
     profile = OpenRTM_aist.Properties(defaults_str=encodeseqdata_spec)
     manager.registerFactory(profile,
                             EncodeSeqData,
                             OpenRTM_aist.Delete)
+
+
+
+def MyModuleInit(manager):
+    EncodeSeqDataInit(manager)
+
+    # Create a component
     comp = manager.createComponent("EncodeSeqData")
+
+
+    
+    
  
 def main():
     mgr = OpenRTM_aist.Manager.init(sys.argv)

@@ -12,6 +12,10 @@
 
 DrawThread *obj = NULL;
 
+
+/**
+*@brief シミュレーションの描画をするスレッドのコンストラクタ
+*/
 DrawThread::DrawThread(SimulatorObj *so)
 {
 	m_so = so;
@@ -22,6 +26,10 @@ DrawThread::DrawThread(SimulatorObj *so)
 	obj = this;
 }
 
+/**
+*@brief シミュレーションループ
+* @param pause 未使用
+*/
 void simLoop(int pause)
 {
 	if(obj)
@@ -32,7 +40,9 @@ void simLoop(int pause)
 
 
 
-
+/**
+*@brief シミュレーション初期化
+*/
 void start()
 {
   //float xyz[3] = {  .0f,  1.0f, 3.0f};  
@@ -50,7 +60,10 @@ void start()
   
 }
 
-
+/**
+*@brief スレッド実行関数
+* @return
+*/
 int DrawThread::svc()
 {
 	int argc = 0;
@@ -62,7 +75,9 @@ int DrawThread::svc()
 }
 
 
-
+/**
+*@brief DrawStuff初期化
+*/
 void DrawThread::setDrawStuff()
 {
 	fn.version = DS_VERSION;
@@ -72,6 +87,10 @@ void DrawThread::setDrawStuff()
   fn.path_to_textures = "drawstuff/textures";
 }
 
+/**
+*@brief 直方体描画
+* @param body ボディオブジェクト
+*/
 void DrawThread::drawBox(MyLink *body)
 {
 	const double sides[3] = {body->lx, body->ly, body->lz};
@@ -80,6 +99,10 @@ void DrawThread::drawBox(MyLink *body)
 						dBodyGetRotation(body->body),sides);
 }
 
+/**
+*@brief 円柱描画
+* @param body ボディオブジェクト
+*/
 void DrawThread::drawCylinder(MyLink *body)
 {
 	dsSetColorAlpha(body->red,body->green,body->blue,1.0);
@@ -87,6 +110,9 @@ void DrawThread::drawCylinder(MyLink *body)
 						dBodyGetRotation(body->body),body->lz,body->lx);
 }
 
+/**
+*@brief 全ボディ描画
+*/
 void DrawThread::drawRobot()
 {
 	if(m_so->pause)

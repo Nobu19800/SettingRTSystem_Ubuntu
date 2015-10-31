@@ -135,7 +135,8 @@ RTC::ReturnCode_t RobotArmSimulator::onExecute(RTC::UniqueId ec_id)
 {
 	m_so->update();
 	if(m_so->rb->stopFalg)
-		return RTC::RTC_ERROR;
+		return RTC::RTC_OK;
+		//return RTC::RTC_ERROR;
 	
 	m_jpos.data.length(m_so->rb->axisNum);
 	for(int i=0;i < m_so->rb->axisNum;i++)

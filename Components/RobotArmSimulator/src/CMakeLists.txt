@@ -1,6 +1,9 @@
+set(arm_file_path ../RobotArm)
+set(defreturnid_file_path thirdparty/RTM_ORiN_Converter_CRD)
+
 set(ODEDir C:/ode-0.13)
 set(EigenDir C:/eigen-eigen-bdd17ee3b1b3)
-set(comp_srcs RobotArmSimulator.cpp ManipulatorCommonInterface_CommonSVC_impl.cpp ManipulatorCommonInterface_MiddleLevelSVC_impl.cpp RobotArm.cpp DrawThread.cpp SimulatorObj.cpp ${ODEDir}/drawstuff/src/resources.rc )
+set(comp_srcs RobotArmSimulator.cpp ManipulatorCommonInterface_CommonSVC_impl.cpp ManipulatorCommonInterface_MiddleLevelSVC_impl.cpp ${arm_file_path}/RobotArm.cpp DrawThread.cpp SimulatorObj.cpp ${ODEDir}/drawstuff/src/resources.rc )
 set(standalone_srcs RobotArmSimulatorComp.cpp)
 
 if (DEFINED OPENRTM_INCLUDE_DIRS)
@@ -30,6 +33,8 @@ include_directories(${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_BINARY_DIR}/idl)
 include_directories(${OPENRTM_INCLUDE_DIRS})
 include_directories(${OMNIORB_INCLUDE_DIRS})
+include_directories(${arm_file_path})
+include_directories(${defreturnid_file_path})
 
 include_directories(${EigenDir})
 include_directories(${ODEDir}/include)

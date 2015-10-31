@@ -1,45 +1,62 @@
 // -*-C++-*-
 /*!
  * @file  ManipulatorCommonInterface_CommonSVC_impl.cpp
- * @brief Service implementation code of ManipulatorCommonInterface_Common.idl
+ * @brief サインスマート製4自由度ロボットアーム用低レベルモーションコマンド
  *
  */
 
 #include "ManipulatorCommonInterface_CommonSVC_impl.h"
+#include "defreturnid.h"
 
-
-/*
- * Example implementational code for IDL interface JARA_ARM::ManipulatorCommonInterface_Common
- */
+/*!
+* @brief サインスマート製4自由度ロボットアーム用低レベルモーションコマンドのコンストラクタ
+* @param ra ロボットアーム制御オブジェクト
+*/
 ManipulatorCommonInterface_CommonSVC_impl::ManipulatorCommonInterface_CommonSVC_impl(RobotArm *ra)
 {
-  // Please add extra constructor code here.
   m_robotArm = ra;
 }
 
-
+/*!
+* @brief サインスマート製4自由度ロボットアーム用低レベルモーションコマンドのデストラクタ
+*/
 ManipulatorCommonInterface_CommonSVC_impl::~ManipulatorCommonInterface_CommonSVC_impl()
 {
-  // Please add extra destructor code here.
+
 }
 
 
-/*
- * Methods corresponding to IDL attributes and operations
- */
+/*!
+* @brief アラームクリア
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::clearAlarms()
 {
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	alarmList.clear();
+	RETURNID_OK;
 }
-
+/*!
+* @brief アラーム情報の取得
+* @param alarms アラーム情報の配列
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::getActiveAlarm(JARA_ARM::AlarmSeq_out alarms)
 {
 	alarms = new JARA_ARM::AlarmSeq;
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	alarms->length(alarmList.size());
+	for (int i = 0; i < alarmList.size(); i++)
+	{
+		(*alarms)[i].code = alarmList[i].code;
+		(*alarms)[i].type = alarmList[i].type;
+		(*alarms)[i].description = alarmList[i].description;
+	}
+	RETURNID_OK;
 }
-
+/*!
+* @brief 関節座標系の位置フィードバック情報の取得
+* @param pos 位置フィードバック情報(シーケンス型)
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::getFeedbackPosJoint(JARA_ARM::JointPos_out pos)
 {
 	pos = new JARA_ARM::JointPos;
@@ -49,10 +66,13 @@ JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::getFeedbackPosJo
 		(*pos)[i] = m_robotArm->theta[i];
 	}
 
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	RETURNID_OK;
 }
-
+/*!
+* @brief マニピュレータ情報の取得
+* @param mInfo マニピュレータ情報
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::getManipInfo(JARA_ARM::ManipInfo_out mInfo)
 {
 	mInfo = new JARA_ARM::ManipInfo;
@@ -62,10 +82,13 @@ JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::getManipInfo(JAR
 	mInfo->cmdCycle = m_robotArm->cmdCycle;
 	mInfo->isGripper = m_robotArm->isGripper;
 
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	RETURNID_OK;
 }
-
+/*!
+* @brief 関節座標系のソフトリミット値を取得
+* @param softLimit 各軸のソフトリミット値[単位:rad]
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::getSoftLimitJoint(JARA_ARM::LimitSeq_out softLimit)
 {
 	softLimit = new JARA_ARM::LimitSeq;
@@ -76,44 +99,63 @@ JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::getSoftLimitJoin
 		(*softLimit)[i].upper = m_robotArm->softLowerLimitJoint[i];
 	}
 
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	RETURNID_OK;
 }
-
+/*!
+* @brief ユニットの状態取得
+* @param state ユニットの状態を表すビットコード
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::getState(JARA_ARM::ULONG& state)
 {
-	state = 0;
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	state = 0x00;
+	if (m_robotArm->serbo)
+	{
+		state += JARA_ARM::CONST_BINARY_00000001;
+	}
+	if (!m_robotArm->stopFalg)
+	{
+		state += JARA_ARM::CONST_BINARY_00000010;
+	}
+	if (alarmList.size() > 0)
+	{
+		state += JARA_ARM::CONST_BINARY_00000100;
+	}
+	if (m_robotArm->pauseFalg > 0)
+	{
+		state += 0x10;
+	}
+	RETURNID_OK;
 }
-
+/*!
+* @brief 全軸サーボ OFF
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::servoOFF()
 {
 	m_robotArm->setSerbo(false);
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	RETURNID_OK;
 }
-
+/*!
+* @brief 全軸サーボ ON
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::servoON()
 {
 	m_robotArm->setSerbo(true);
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	RETURNID_OK;
 }
-
+/*!
+* @brief 関節座標系のソフトリミット値設定
+* @param softLimit 各軸のソフトリミット値[単位:rad]
+* @return JARA_ARM::RETURN_ID
+*/
 JARA_ARM::RETURN_ID *ManipulatorCommonInterface_CommonSVC_impl::setSoftLimitJoint(const JARA_ARM::LimitSeq &softLimit)
 {
 	for(int i=0;i<softLimit.length()&&i<m_robotArm->axisNum;i++){
 		m_robotArm->softUpperLimitJoint[i] = softLimit[i].lower;
 		m_robotArm->softLowerLimitJoint[i] = softLimit[i].upper;
 	}
-	JARA_ARM::RETURN_ID_var result = new JARA_ARM::RETURN_ID();
-  return result._retn();
+	RETURNID_OK;
 }
-
-
-
-// End of example implementational code
-
-
 

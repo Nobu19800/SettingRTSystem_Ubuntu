@@ -1,9 +1,17 @@
+/*!
+* @file  SimulatorObj.cpp
+* @brief シミュレーション関連のクラス
+*
+*/
+
 #include "SimulatorObj.h"
 
 SimulatorObj *obj = NULL;
 
 
-
+/**
+*@brief シミュレーションの操作をするためのクラスのコンストラクタ
+*/
 SimulatorObj::SimulatorObj()
 {
 	st = 0.01;
@@ -29,6 +37,9 @@ SimulatorObj::SimulatorObj()
 	obj = this;
 }
 
+/**
+*@brief シミュレーションの操作をするためのクラスのデストラクタ
+*/
 SimulatorObj::~SimulatorObj()
 {
 	dSpaceDestroy(space);
@@ -36,7 +47,9 @@ SimulatorObj::~SimulatorObj()
 	dCloseODE();
 }
 
-
+/**
+*@brief 各パラメータの初期化を行う
+*/
 void SimulatorObj::makeParam()
 {
 	link0.m = rb->m[0];
@@ -168,6 +181,10 @@ void SimulatorObj::makeParam()
 
 }
 
+/**
+*@brief 直方体作成
+* @param body ボディオブジェクト
+*/
 void SimulatorObj::setBox(MyLink *body)
 {
 	dMass mass;
@@ -180,6 +197,10 @@ void SimulatorObj::setBox(MyLink *body)
 	dBodySetPosition(body->body, body->x, body->y, body->z);
 }
 
+/**
+*@brief 円柱作成
+* @param body ボディオブジェクト
+*/
 void SimulatorObj::setCylinder(MyLink *body)
 {
 	dMass mass;
@@ -192,6 +213,11 @@ void SimulatorObj::setCylinder(MyLink *body)
 	dBodySetPosition(body->body, body->x, body->y, body->z);
 }
 
+/**
+*@brief ヒンジジョイント作成
+* @param body1 ボディ1
+* @param body2 ボディ2
+*/
 void SimulatorObj::setHinge(MyLink *body1, MyLink *body2)
 {
 	body1->joint = dJointCreateHinge(world, 0);
@@ -200,6 +226,11 @@ void SimulatorObj::setHinge(MyLink *body1, MyLink *body2)
 	dJointSetHingeAxis(body1->joint, body1->axisx, body1->axisy,body1->axisz);
 }
 
+/**
+*@brief スライダージョイント作成
+* @param body1 ボディ1
+* @param body2 ボディ2
+*/
 void SimulatorObj::setSlider(MyLink *body1, MyLink *body2)
 {
 	body1->joint = dJointCreateSlider(world, 0);
@@ -208,6 +239,11 @@ void SimulatorObj::setSlider(MyLink *body1, MyLink *body2)
 	dJointSetSliderAxis(body1->joint, body1->axisx, body1->axisy,body1->axisz);
 }
 
+/**
+*@brief 固定ジョイント作成
+* @param body1 ボディ1
+* @param body2 ボディ2
+*/
 void SimulatorObj::setFixed(MyLink *body1, MyLink *body2)
 {
 	body1->joint = dJointCreateFixed(world, 0);
@@ -215,6 +251,9 @@ void SimulatorObj::setFixed(MyLink *body1, MyLink *body2)
 	dJointSetFixed(body1->joint);
 }
 
+/**
+*@brief 全ボディ、接続する全ジョイント生成
+*/
 void SimulatorObj::makeRobot()
 {
 	mu.lock();
@@ -248,6 +287,11 @@ void SimulatorObj::makeRobot()
 	rb->setStartPos(0, 1.5, -0.5, 0);
 }
 
+/**
+*@brief 接触コールバック
+* @param o1 ジオメトリ1
+* @param o2 ジオメトリ2
+*/
 void SimulatorObj::m_nearCallback(dGeomID o1, dGeomID o2)
 {
 	//return;
@@ -280,6 +324,12 @@ void SimulatorObj::m_nearCallback(dGeomID o1, dGeomID o2)
 	}
 }
 
+/**
+*@brief 接触コールバック
+* @param data データ
+* @param o1 ジオメトリ1
+* @param o2 ジオメトリ2
+*/
 static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 	
 	if(obj)
@@ -290,6 +340,11 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 		
 }
 
+/**
+*@brief ヒンジジョイント制御
+* @param body ボディオブジェクト
+* @param theta ヒンジジョイントの位置
+*/
 void SimulatorObj::controlHinge(MyLink *body, dReal theta)
 {
 	dReal kp = 100;
@@ -301,6 +356,11 @@ void SimulatorObj::controlHinge(MyLink *body, dReal theta)
 	dJointSetHingeParam(body->joint,dParamFMax,20.);
 }
 
+/**
+*@brief スライダージョイント制御
+* @param body ボディオブジェクト
+* @param length スライダージョイントの位置
+*/
 void SimulatorObj::controlSlider(MyLink *body, dReal length)
 {
 	dReal kp = 10;
@@ -312,6 +372,9 @@ void SimulatorObj::controlSlider(MyLink *body, dReal length)
 	dJointSetSliderParam (body->joint,dParamFMax,20.);
 }
 
+/**
+*@brief 全ジョイント制御
+*/
 void SimulatorObj::control()
 {
 	rb->update(st);
@@ -328,6 +391,9 @@ void SimulatorObj::control()
 	controlSlider(&linkf[1], -rb->gripperPos/2);//
 }
 
+/**
+*@brief 更新
+*/
 void SimulatorObj::update()
 {
 	if(pause)
@@ -342,6 +408,9 @@ void SimulatorObj::update()
 	}
 }
 
+/**
+*@brief 全ボディ、接続する全ジョイント消去
+*/
 void SimulatorObj::destroyRobot()
 {
 	mu.lock();
